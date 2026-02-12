@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ILOMOCA Audio Scheduler</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f5f7;
+  padding: 0;
+}
+
+.header {
+  background: #21005D;
+  color: white;
+  padding: 30px 40px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.now-playing-box {
+  background: #d9d9d9;
+  border-radius: 8px;
+  height: 120px;
+  margin: 20px 0;
+}
+
+.controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+button {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  background: #21005D;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: #350084;
+  transform: translateY(-1px);
+}
+
+button.add-songs {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.scheduled-header {
+  background: #e8e4f0;
+  border-radius: 8px;
+  padding: 40px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #666;
+}
+
+.list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.item:hover {
+  background: #f9f9f9;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-icon {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.play-icon::before {
+  content: '▶';
+  margin-left: 2px;
+}
+
+.item-text {
+  color: #333;
+  font-size: 14px;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 13px;
+}
+
+.arrow {
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 13px;
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none;
+  z-index: 100;
+  min-width: 140px;
+  margin-top: 5px;
+}
+
+.dropdown.active {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 14px;
+  color: #333;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
+}
+
+.dropdown-item.delete {
+  color: #f44336;
+}
+
+.dropdown-item.delete:hover {
+  background: #ffebee;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.modal-text {
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}
+
+button.cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+button.cancel:hover {
+  background: #d0d0d0;
+}
+
+button.confirm-delete {
+  background: #f44336;
+}
+
+button.confirm-delete:hover {
+  background: #d32f2f;
+}
+
+.now-playing-text {
+  padding: 20px;
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+.scheduled-text {
+  padding: 20px;
+  font-size: 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+video {
+  width: 100%;
+  background: #000;
+  border-radius: 6px;
+  display: none;
+}
+
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup.active { display: flex; }
+
+.popup video {
+  width: 90%;
+  max-width: 1000px;
+}
+
+.hidden-inputs {
+  display: none;
+}
+
+input[type="time"] {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  ILOMOCA Audio Scheduler
+</div>
+
+<div class="container">
+  <!-- LEFT SECTION -->
+  <div class="section">
+    <div class="section-title">Now Playing:</div>
+    
+    <div class="now-playing-box">
+      <div class="now-playing-text" id="nowPlayingText">No song playing</div>
+    </div>
+    
+    <video id="mainVideo" controls></video>
+    
+    <div class="controls">
+      <button onclick="startPlaylist()">Start</button>
+      <button onclick="pausePlaylist()">Pause</button>
+      <button onclick="continuePlaylist()">Continue</button>
+      <button onclick="stopPlaylist()">Stop</button>
+    </div>
+    
+    <div class="section-title">Playlist</div>
+    
+    <div class="list" id="playlistList">
+      <!-- Playlist items will appear here -->
+    </div>
+    
+    <button class="add-songs" onclick="playlistUpload.click()">Add Songs</button>
+  </div>
+
+  <!-- RIGHT SECTION -->
+  <div class="section">
+    <div class="section-title">Scheduled</div>
+    
+    <div class="scheduled-header">
+      <div class="scheduled-text" id="nextScheduledText">No upcoming scheduled items</div>
+    </div>
+    
+    <div class="list" id="scheduleList">
+      <!-- Scheduled items will appear here -->
+    </div>
+    
+    <div style="margin-top: 20px;">
+      <input type="time" id="scheduleTime" placeholder="Select time">
+      <select id="scheduleSelect">
+        <option value="">Select a file...</option>
+      </select>
+      <button style="width: 100%; margin-bottom: 10px;" onclick="scheduleUpload.click()">Upload File for Schedule</button>
+      <button class="add-songs" onclick="addSchedule()">Add to Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN INPUTS -->
+<div class="hidden-inputs">
+  <input type="file" id="playlistUpload" multiple>
+  <input type="file" id="scheduleUpload">
+</div>
+
+<!-- POPUP -->
+<div class="popup" id="popup">
+  <video id="popupVideo" controls></video>
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div class="modal" id="confirmModal">
+  <div class="modal-content">
+    <div class="modal-title">Confirm Delete</div>
+    <div class="modal-text" id="confirmText">Are you sure you want to remove this item?</div>
+    <div class="modal-buttons">
+      <button class="cancel" onclick="closeConfirmModal()">Cancel</button>
+      <button class="confirm-delete" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SCHEDULE MODAL -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <div class="modal-title">Edit Schedule</div>
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Time</label>
+      <input type="time" id="editTime" style="width: 100%; margin-bottom: 15px;">
+      
+      <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">File</label>
+      <select id="editSelect" style="width: 100%; margin-bottom: 0;">
+        <option value="">Select a file...</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button class="cancel" onclick="closeEditModal()">Cancel</button>
+      <button onclick="saveEditSchedule()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "http://localhost:3001";
+
+let playlist = [];
+let schedules = [];
+let index = 0;
+let running = false;
+let pausedForSchedule = false;
+let pausedTime = 0;
+let deleteCallback = null;
+let lastTriggeredSchedule = null;
+
+const mainVideo = document.getElementById("mainVideo");
+const popup = document.getElementById("popup");
+const popupVideo = document.getElementById("popupVideo");
+const confirmModal = document.getElementById("confirmModal");
+
+// Ensure only one video plays at a time
+mainVideo.onplay = () => {
+  if (!popupVideo.paused && !popup.classList.contains('active')) {
+    popupVideo.pause();
+  }
+};
+
+popupVideo.onplay = () => {
+  if (!mainVideo.paused && popup.classList.contains('active')) {
+    mainVideo.pause();
+  }
+};
+
+/* ---------------- UPLOAD ---------------- */
+
+async function upload(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  const res = await fetch(API + "/upload", { method: "POST", body: fd });
+  return res.json();
+}
+
+playlistUpload.onchange = async e => {
+  for (let f of e.target.files) {
+    const u = await upload(f);
+    playlist.push(u);
+  }
+  savePlaylist();
+  renderPlaylist();
+};
+
+scheduleUpload.onchange = async e => {
+  const u = await upload(e.target.files[0]);
+  const option = document.createElement('option');
+  option.value = u.url;
+  option.textContent = u.name;
+  scheduleSelect.appendChild(option);
+  
+  // Also add to edit dropdown
+  const editOption = document.createElement('option');
+  editOption.value = u.url;
+  editOption.textContent = u.name;
+  editSelect.appendChild(editOption);
+};
+
+/* ---------------- EDIT SCHEDULE ---------------- */
+
+let editingIndex = null;
+const editModal = document.getElementById("editModal");
+const editTime = document.getElementById("editTime");
+const editSelect = document.getElementById("editSelect");
+
+function showEditSchedule(index) {
+  closeAllDropdowns();
+  editingIndex = index;
+  const schedule = schedules[index];
+  
+  editTime.value = schedule.time;
+  editSelect.value = schedule.url;
+  
+  editModal.classList.add('active');
+}
+
+function closeEditModal() {
+  editModal.classList.remove('active');
+  editingIndex = null;
+}
+
+function saveEditSchedule() {
+  if (!editTime.value || !editSelect.value) {
+    return alert("Please select time and file");
+  }
+  
+  const fileName = editSelect.options[editSelect.selectedIndex].text;
+  schedules[editingIndex] = {
+    time: editTime.value,
+    url: editSelect.value,
+    name: fileName
+  };
+  
+  saveSchedules();
+  renderSchedules();
+  closeEditModal();
+}
+
+// Close edit modal when clicking outside
+editModal.onclick = (e) => {
+  if (e.target === editModal) {
+    closeEditModal();
+  }
+};
+
+/* ---------------- PLAYLIST ---------------- */
+
+async function loadPlaylist() {
+  try {
+    const res = await fetch(API + "/playlist");
+    playlist = await res.json();
+    renderPlaylist();
+  } catch (e) {
+    console.log("Could not load playlist");
+  }
+}
+loadPlaylist();
+
+function savePlaylist() {
+  fetch(API + "/playlist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(playlist)
+  });
+}
+
+function startPlaylist() {
+  if (!playlist.length) return alert("No playlist");
+  running = true;
+  play(0);
+}
+
+function pausePlaylist() {
+  mainVideo.pause();
+}
+
+function continuePlaylist() {
+  if (!playlist.length) return alert("No playlist");
+  if (!mainVideo.src) return alert("No song loaded. Press Start first.");
+  running = true;
+  mainVideo.play();
+}
+
+function stopPlaylist() {
+  running = false;
+  mainVideo.pause();
+  mainVideo.currentTime = 0;
+  pausedForSchedule = false;
+  pausedTime = 0;
+  document.getElementById('nowPlayingText').textContent = 'No song playing';
+}
+
+function play(i) {
+  // Stop any currently playing video first
+  mainVideo.pause();
+  mainVideo.currentTime = 0;
+  
+  index = i % playlist.length;
+  const currentSong = playlist[index];
+  mainVideo.src = currentSong.url;
+  mainVideo.play();
+  
+  // Update Now Playing display
+  document.getElementById('nowPlayingText').textContent = currentSong.name;
+  
+  mainVideo.onended = () => running && play(index + 1);
+}
+
+function renderPlaylist() {
+  if (playlist.length === 0) {
+    playlistList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No songs in playlist</div>';
+    return;
+  }
+  
+  playlistList.innerHTML = playlist.map((p, i) =>
+    `<div class="item">
+      <div class="item-left" onclick="play(${i})" style="cursor: pointer; flex: 1;">
+        <div class="play-icon"></div>
+        <div class="item-text">${p.name}</div>
+      </div>
+      <div class="item-right">
+        <span class="arrow" onclick="toggleDropdown(event, 'playlist-${i}')">⋮</span>
+        <div class="dropdown" id="playlist-${i}">
+          <div class="dropdown-item delete" onclick="showConfirmDelete('playlist', ${i}, '${p.name.replace(/'/g, "\\'")}')">Delete</div>
+        </div>
+      </div>
+    </div>`
+  ).join("");
+}
+
+function showConfirmDelete(type, index, name) {
+  closeAllDropdowns();
+  const confirmText = document.getElementById('confirmText');
+  confirmText.textContent = `Are you sure you want to remove "${name}"?`;
+  deleteCallback = () => {
+    if (type === 'playlist') {
+      playlist.splice(index, 1);
+      savePlaylist();
+      renderPlaylist();
+    } else if (type === 'schedule') {
+      schedules.splice(index, 1);
+      saveSchedules();
+      renderSchedules();
+    }
+  };
+  confirmModal.classList.add('active');
+}
+
+function closeConfirmModal() {
+  confirmModal.classList.remove('active');
+  deleteCallback = null;
+}
+
+// Close modal when clicking outside
+confirmModal.onclick = (e) => {
+  if (e.target === confirmModal) {
+    closeConfirmModal();
+  }
+};
+
+function confirmDelete() {
+  if (deleteCallback) {
+    deleteCallback();
+  }
+  closeConfirmModal();
+}
+
+function toggleDropdown(event, id) {
+  event.stopPropagation();
+  closeAllDropdowns();
+  const dropdown = document.getElementById(id);
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+  }
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', closeAllDropdowns);
+
+/* ---------------- SCHEDULE ---------------- */
+
+async function loadSchedules() {
+  try {
+    const res = await fetch(API + "/schedules");
+    schedules = await res.json();
+    
+    // Populate both dropdowns with unique files from schedules
+    const uniqueFiles = new Map();
+    schedules.forEach(s => {
+      if (s.url && s.name) {
+        uniqueFiles.set(s.url, s.name);
+      }
+    });
+    
+    uniqueFiles.forEach((name, url) => {
+      // Add to schedule dropdown
+      const option = document.createElement('option');
+      option.value = url;
+      option.textContent = name;
+      scheduleSelect.appendChild(option);
+      
+      // Add to edit dropdown
+      const editOption = document.createElement('option');
+      editOption.value = url;
+      editOption.textContent = name;
+      editSelect.appendChild(editOption);
+    });
+    
+    renderSchedules();
+  } catch (e) {
+    console.log("Could not load schedules");
+  }
+}
+loadSchedules();
+
+function saveSchedules() {
+  fetch(API + "/schedules", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(schedules)
+  });
+}
+
+function addSchedule() {
+  if (!scheduleTime.value || !scheduleSelect.value) return alert("Please select time and file");
+  const fileName = scheduleSelect.options[scheduleSelect.selectedIndex].text;
+  schedules.push({
+    time: scheduleTime.value,
+    url: scheduleSelect.value,
+    name: fileName
+  });
+  saveSchedules();
+  renderSchedules();
+  scheduleTime.value = "";
+}
+
+function renderSchedules() {
+  if (schedules.length === 0) {
+    scheduleList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No scheduled items</div>';
+    updateNextScheduled();
+    return;
+  }
+  
+  const listHTML = schedules.map((s, i) =>
+    `<div class="item">
+      <div class="item-left" style="flex: 1;">
+        <div class="play-icon"></div>
+        <div class="item-text">${s.name || 'Scheduled item'}</div>
+      </div>
+      <div class="item-right">
+        <span style="margin-right: 10px;">${s.time}</span>
+        <span class="arrow" onclick="toggleDropdown(event, 'schedule-${i}')">⋮</span>
+        <div class="dropdown" id="schedule-${i}">
+          <div class="dropdown-item" onclick="showEditSchedule(${i})">Edit</div>
+          <div class="dropdown-item delete" onclick="showConfirmDelete('schedule', ${i}, '${(s.name || 'Scheduled item').replace(/'/g, "\\'")}')">Delete</div>
+        </div>
+      </div>
+    </div>`
+  ).join("");
+  
+  scheduleList.innerHTML = listHTML;
+  updateNextScheduled();
+}
+
+function updateNextScheduled() {
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+  
+  // Find next scheduled item
+  const upcoming = schedules
+    .map((s, i) => ({ ...s, index: i }))
+    .filter(s => s.time > currentTime)
+    .sort((a, b) => a.time.localeCompare(b.time));
+  
+  const nextScheduledText = document.getElementById('nextScheduledText');
+  
+  if (upcoming.length > 0) {
+    const next = upcoming[0];
+    nextScheduledText.textContent = `${next.name} at ${next.time}`;
+  } else if (schedules.length > 0) {
+    // If no upcoming today, show first one for tomorrow
+    const first = schedules.sort((a, b) => a.time.localeCompare(b.time))[0];
+    nextScheduledText.textContent = `${first.name} at ${first.time} (tomorrow)`;
+  } else {
+    nextScheduledText.textContent = 'No upcoming scheduled items';
+  }
+}
+
+setInterval(() => {
+  const now = new Date();
+  const t = now.toTimeString().slice(0,5);
+  
+  schedules.forEach((s, i) => {
+    const scheduleKey = `${s.time}-${s.url}`;
+    if (s.time === t && lastTriggeredSchedule !== scheduleKey) {
+      lastTriggeredSchedule = scheduleKey;
+      playScheduled(s.url);
+    }
+  });
+  
+  // Reset trigger flag when minute changes
+  const currentMinute = now.getMinutes();
+  if (currentMinute !== (new Date(Date.now() - 1000).getMinutes())) {
+    lastTriggeredSchedule = null;
+  }
+  
+  updateNextScheduled();
+}, 1000);
+
+function playScheduled(url) {
+  // Find the scheduled item name
+  const scheduledItem = schedules.find(s => s.url === url);
+  
+  // Save current playlist state if it's playing
+  if (running && !mainVideo.paused) {
+    pausedForSchedule = true;
+    pausedTime = mainVideo.currentTime;
+    mainVideo.pause();
+  }
+  
+  // Stop popup video completely
+  popupVideo.pause();
+  popupVideo.currentTime = 0;
+  
+  // Set new source WITHOUT showing popup first
+  popupVideo.src = url;
+  
+  // Show popup and play only after video is ready
+  popupVideo.oncanplay = function() {
+    popup.classList.add("active");
+    this.play();
+    this.oncanplay = null; // Remove this handler immediately
+  };
+  
+  // Update Now Playing for scheduled item
+  if (scheduledItem) {
+    document.getElementById('nowPlayingText').textContent = scheduledItem.name + ' (Scheduled)';
+  }
+}
+  
+  popupVideo.onended = () => {
+    popup.classList.remove("active");
+    
+    // Resume playlist if it was playing before
+    if (pausedForSchedule && playlist.length > 0) {
+      mainVideo.currentTime = pausedTime;
+      mainVideo.play();
+      pausedForSchedule = false;
+      pausedTime = 0;
+      document.getElementById('nowPlayingText').textContent = playlist[index].name;
+    } else if (!running) {
+      document.getElementById('nowPlayingText').textContent = 'No song playing';
+    }
+  };
+
+// Close popup on click outside video
+popup.onclick = (e) => {
+  if (e.target === popup) {
+    popup.classList.remove("active");
+    popupVideo.pause();
+    
+    // Resume playlist if it was paused for schedule
+    if (pausedForSchedule && playlist.length > 0) {
+      mainVideo.currentTime = pausedTime;
+      mainVideo.play();
+      pausedForSchedule = false;
+      pausedTime = 0;
+      document.getElementById('nowPlayingText').textContent = playlist[index].name;
+    } else if (!running) {
+      document.getElementById('nowPlayingText').textContent = 'No song playing';
+    }
+  }
+};
+</script>
+
+</body>
+</html>
