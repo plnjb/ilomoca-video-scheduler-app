@@ -1,0 +1,20 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.ilomoca.audioscheduler
+productName: ILOMOCA Audio Scheduler
+files:
+  - filter:
+      - main.js
+      - preload.js
+      - frontend/**/*
+      - node_modules/**/*
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  forceCodeSigning: false
+mac:
+  target: []
+electronVersion: 40.4.0

@@ -1,12 +1,13 @@
 {
   "name": "ilomoca-audio-scheduler",
-  "version": "5.0.0",
+  "version": "7.0.0",
   "description": "ILOMOCA Audio Scheduler Desktop App",
   "main": "main.js",
   "author": "Pauline Joy Bautista",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win --x64"
+    "build": "electron-builder --win --x64",
+    "builder": "electron-builder --win --x64"
   },
   "devDependencies": {
     "electron": "^40.4.0",

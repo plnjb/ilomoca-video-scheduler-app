@@ -4,7 +4,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
-// IMPORTANT: get a writable user directory
+// To get a writable user directory
 let USER_DATA_PATH;
 
 try {

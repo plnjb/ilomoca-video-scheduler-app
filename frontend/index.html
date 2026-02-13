@@ -9,22 +9,15 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #f5f5f7;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
   padding: 0;
-}
-
-.header {
-  background: #21005D;
-  color: white;
-  padding: 30px 40px;
-  font-size: 24px;
-  font-weight: 500;
+  min-height: 100vh;
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px;
+  padding: 30px 40px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
@@ -32,96 +25,425 @@ body {
 
 .section {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e1e8ed;
 }
 
+/* Vinyl Record Animation */
 .now-playing-box {
-  background: #d9d9d9;
-  border-radius: 8px;
-  height: 120px;
+  background: transparent;
+  border-radius: 12px;
+  height: 200px;
   margin: 20px 0;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.vinyl-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.vinyl-record {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #2a2a2a 0%, #0a0a0a 100%);
+  position: relative;
+  animation: spin 4s linear infinite paused;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.vinyl-record.playing {
+  animation-play-state: running;
+}
+
+/* Animated gradient ring around vinyl */
+.vinyl-record::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #3498db,
+    #5dade2,
+    #2980b9,
+    #3498db
+  );
+  animation: rotate 3s linear infinite;
+  z-index: -1;
+}
+
+.vinyl-record.playing::before {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.vinyl-grooves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+.groove {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.groove:nth-child(1) { width: 90%; height: 90%; }
+.groove:nth-child(2) { width: 80%; height: 80%; }
+.groove:nth-child(3) { width: 70%; height: 70%; }
+.groove:nth-child(4) { width: 60%; height: 60%; }
+.groove:nth-child(5) { width: 50%; height: 50%; }
+
+.vinyl-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(52,152,219,0.6);
+}
+
+.vinyl-center {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.now-playing-info {
+  position: absolute;
+  bottom: 15px;
+  left: 20px;
+  right: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.now-playing-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.now-playing-status {
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+/* Controls */
 .controls {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   margin-bottom: 30px;
 }
 
 button {
   flex: 1;
-  padding: 12px 24px;
+  padding: 14px 20px;
   border: none;
   border-radius: 25px;
   cursor: pointer;
-  background: #21005D;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   color: white;
-  font-size: 15px;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 button:hover {
-  background: #350084;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52,152,219,0.4);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 button.add-songs {
   width: 100%;
   margin-top: 20px;
+  background: linear-gradient(135deg, #2980b9 0%, #1f6391 100%);
 }
 
-.section-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #333;
+button.stop-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231,76,60,0.3);
 }
 
-.scheduled-header {
-  background: #e8e4f0;
-  border-radius: 8px;
+button.stop-btn:hover {
+  box-shadow: 0 6px 20px rgba(231,76,60,0.4);
+}
+
+/* Upload Modal */
+.upload-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.upload-modal.active {
+  display: flex;
+}
+
+.upload-content {
+  background: white;
+  border-radius: 16px;
   padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  border: 1px solid #e1e8ed;
+  text-align: center;
+}
+
+.upload-drop-zone {
+  border: 3px dashed rgba(52,152,219,0.4);
+  border-radius: 12px;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 20px 0;
+}
+
+.upload-drop-zone.dragover {
+  border-color: #3498db;
+  background: linear-gradient(135deg, #e8f4f8 0%, #d6eaf8 100%);
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(52,152,219,0.3);
+}
+
+.upload-drop-zone-icon {
+  font-size: 64px;
+  margin-bottom: 15px;
+  opacity: 0.7;
+}
+
+.upload-drop-zone-text {
+  color: #3498db;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.upload-drop-zone-subtext {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.upload-modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+  border-radius: 2px;
+}
+
+/* Scheduled Header */
+.scheduled-header {
+  background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+  border-radius: 12px;
+  padding: 30px;
   margin-bottom: 20px;
   text-align: center;
-  color: #666;
+  color: #2c3e50;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #d5dbdb;
 }
 
+.scheduled-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* List */
 .list {
-  max-height: 400px;
+  max-height: 500px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
+.list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: #ecf0f1;
+  border-radius: 4px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+  border-radius: 4px;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: #3498db;
+}
+
+/* Items */
 .item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 10px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  transition: background 0.2s;
+  padding: 15px 12px;
+  border-bottom: 1px solid #ecf0f1;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.item.draggable {
+  cursor: move;
 }
 
 .item:hover {
-  background: #f9f9f9;
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0f3f4 100%);
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(52,152,219,0.15);
+}
+
+.item.playing {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  box-shadow: 0 4px 15px rgba(52,152,219,0.4);
+  transform: translateX(5px);
+}
+
+.item.playing .item-text,
+.item.playing .drag-handle {
+  color: white;
+  font-weight: 600;
+}
+
+.item.playing .play-icon {
+  background: white;
+  border-color: white;
+  color: #3498db;
+}
+
+.item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.item.drag-over {
+  border-top: 3px solid #3498db;
 }
 
 .item-left {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+}
+
+.drag-handle {
+  color: #95a5a6;
+  cursor: grab;
+  font-size: 18px;
+  padding: 0 5px;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
 
 .play-icon {
-  width: 24px;
-  height: 24px;
-  border: 2px solid #333;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #3498db;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 12px;
+  color: #3498db;
+  background: white;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .play-icon::before {
@@ -129,80 +451,116 @@ button.add-songs {
   margin-left: 2px;
 }
 
+.item:hover .play-icon {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(52,152,219,0.4);
+}
+
 .item-text {
-  color: #333;
+  color: #2c3e50;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .item-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #666;
-  font-size: 13px;
-}
-
-.arrow {
-  font-size: 16px;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.item-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #666;
+  color: #7f8c8d;
   font-size: 13px;
   position: relative;
 }
 
+.arrow {
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  color: #95a5a6;
+}
+
+.item.playing .arrow {
+  color: white;
+}
+
+.arrow:hover {
+  background: rgba(52,152,219,0.1);
+  color: #3498db;
+}
+
+/* Dropdown */
 .dropdown {
   position: absolute;
   right: 0;
   top: 100%;
   background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   display: none;
   z-index: 100;
   min-width: 140px;
   margin-top: 5px;
+  overflow: hidden;
 }
 
 .dropdown.active {
   display: block;
+  animation: dropdownSlide 0.3s ease;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item {
   padding: 12px 16px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
   font-size: 14px;
-  color: #333;
+  color: #2c3e50;
 }
 
 .dropdown-item:hover {
-  background: #f5f5f5;
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0f3f4 100%);
+  color: #3498db;
 }
 
 .dropdown-item.delete {
-  color: #f44336;
+  color: #e74c3c;
 }
 
 .dropdown-item.delete:hover {
-  background: #ffebee;
+  background: linear-gradient(135deg, #fdeaea 0%, #fadbd8 100%);
+  color: #c0392b;
 }
 
+/* Modal */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(5px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal.active {
@@ -211,24 +569,37 @@ button.add-songs {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 30px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: modalSlide 0.3s ease;
+  border: 1px solid #e1e8ed;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
   margin-bottom: 10px;
-  color: #333;
+  color: #2c3e50;
 }
 
 .modal-text {
-  color: #666;
+  color: #7f8c8d;
   margin-bottom: 25px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .modal-buttons {
@@ -241,43 +612,33 @@ button.add-songs {
 }
 
 button.cancel {
-  background: #e0e0e0;
-  color: #333;
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  color: white;
+  border: none;
 }
 
 button.cancel:hover {
-  background: #d0d0d0;
+  background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
 }
 
 button.confirm-delete {
-  background: #f44336;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 }
 
 button.confirm-delete:hover {
-  background: #d32f2f;
+  background: linear-gradient(135deg, #ec7063 0%, #e74c3c 100%);
 }
 
-.now-playing-text {
-  padding: 20px;
-  font-size: 16px;
-  color: #666;
-  font-weight: 500;
-}
-
-.scheduled-text {
-  padding: 20px;
-  font-size: 16px;
-  color: #666;
-  font-weight: 500;
-}
-
+/* Video - HIDDEN */
 video {
-  width: 100%;
-  background: #000;
-  border-radius: 6px;
-  display: none;
+  display: none !important;
 }
 
+#mainVideo {
+  display: none !important;
+}
+
+/* Popup */
 .popup {
   position: fixed;
   inset: 0;
@@ -286,98 +647,181 @@ video {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(10px);
 }
 
-.popup.active { display: flex; }
+.popup.active { 
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
 
 .popup video {
   width: 90%;
   max-width: 1000px;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  display: block !important;
 }
 
+/* Hidden Inputs */
 .hidden-inputs {
   display: none;
 }
 
+/* Form Inputs */
 input[type="time"] {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
   font-size: 14px;
   margin-bottom: 15px;
+  transition: all 0.3s ease;
+  width: 100%;
+  background: white;
+  color: #2c3e50;
+}
+
+input[type="time"]:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
 }
 
 select {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
   font-size: 14px;
   width: 100%;
   margin-bottom: 15px;
+  transition: all 0.3s ease;
+  background: white;
+  cursor: pointer;
+  color: #2c3e50;
+}
+
+select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #95a5a6;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+  opacity: 0.3;
+}
+
+.empty-state-text {
+  font-size: 15px;
+  color: #95a5a6;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  ILOMOCA Audio Scheduler
-</div>
-
 <div class="container">
   <!-- LEFT SECTION -->
   <div class="section">
-    <div class="section-title">Now Playing:</div>
+    <div class="section-title">Now Playing</div>
     
     <div class="now-playing-box">
-      <div class="now-playing-text" id="nowPlayingText">No song playing</div>
+      <div class="vinyl-container">
+        <div class="vinyl-record" id="vinylRecord">
+          <div class="vinyl-grooves">
+            <div class="groove"></div>
+            <div class="groove"></div>
+            <div class="groove"></div>
+            <div class="groove"></div>
+            <div class="groove"></div>
+          </div>
+          <div class="vinyl-label">
+            <div class="vinyl-center"></div>
+          </div>
+        </div>
+      </div>
+      <div class="now-playing-info">
+        <div class="now-playing-title" id="nowPlayingText">No song playing</div>
+        <div class="now-playing-status" id="nowPlayingStatus">Ready</div>
+      </div>
     </div>
     
     <video id="mainVideo" controls></video>
     
     <div class="controls">
-      <button onclick="startPlaylist()">Start</button>
-      <button onclick="pausePlaylist()">Pause</button>
-      <button onclick="continuePlaylist()">Continue</button>
-      <button onclick="stopPlaylist()">Stop</button>
+      <button id="playPauseBtn" onclick="togglePlayPause()">▶ Play</button>
+      <button class="stop-btn" onclick="stopPlaylist()">⏹ Stop</button>
     </div>
     
     <div class="section-title">Playlist</div>
     
     <div class="list" id="playlistList">
-      <!-- Playlist items will appear here -->
+      <div class="empty-state">
+        <div class="empty-state-icon">🎼</div>
+        <div class="empty-state-text">No songs in playlist</div>
+      </div>
     </div>
     
-    <button class="add-songs" onclick="playlistUpload.click()">Add Songs</button>
+    <button class="add-songs" onclick="showPlaylistUploadModal()">➕ Add Songs to Playlist</button>
   </div>
 
   <!-- RIGHT SECTION -->
   <div class="section">
-    <div class="section-title">Scheduled</div>
+    <div class="section-title">Scheduled Playback</div>
     
     <div class="scheduled-header">
       <div class="scheduled-text" id="nextScheduledText">No upcoming scheduled items</div>
     </div>
     
     <div class="list" id="scheduleList">
-      <!-- Scheduled items will appear here -->
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <div class="empty-state-text">No scheduled items</div>
+      </div>
     </div>
     
     <div style="margin-top: 20px;">
+      <label for="scheduleTime">Schedule Time</label>
       <input type="time" id="scheduleTime" placeholder="Select time">
+      
+      <label for="scheduleSelect">Select File</label>
       <select id="scheduleSelect">
         <option value="">Select a file...</option>
       </select>
-      <button style="width: 100%; margin-bottom: 10px;" onclick="scheduleUpload.click()">Upload File for Schedule</button>
-      <button class="add-songs" onclick="addSchedule()">Add to Schedule</button>
+      
+      <button class="add-songs" style="margin-bottom: 10px;" onclick="addSchedule()">➕ Add to Schedule</button>
+      <button class="add-songs" onclick="showScheduleUploadModal()">📁 Upload File for Scheduling</button>
     </div>
   </div>
 </div>
 
 <!-- HIDDEN INPUTS -->
 <div class="hidden-inputs">
-  <input type="file" id="playlistUpload" multiple>
-  <input type="file" id="scheduleUpload">
+  <input type="file" id="playlistUpload" multiple accept="audio/*,video/*">
+  <input type="file" id="scheduleUpload" accept="audio/*,video/*">
 </div>
 
 <!-- POPUP -->
@@ -402,18 +846,44 @@ select {
   <div class="modal-content">
     <div class="modal-title">Edit Schedule</div>
     <div style="margin-bottom: 15px;">
-      <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">Time</label>
-      <input type="time" id="editTime" style="width: 100%; margin-bottom: 15px;">
+      <label for="editTime">Time</label>
+      <input type="time" id="editTime">
       
-      <label style="display: block; margin-bottom: 5px; font-size: 14px; color: #666;">File</label>
-      <select id="editSelect" style="width: 100%; margin-bottom: 0;">
+      <label for="editSelect">File</label>
+      <select id="editSelect">
         <option value="">Select a file...</option>
       </select>
     </div>
     <div class="modal-buttons">
       <button class="cancel" onclick="closeEditModal()">Cancel</button>
-      <button onclick="saveEditSchedule()">Save</button>
+      <button onclick="saveEditSchedule()">Save Changes</button>
     </div>
+  </div>
+</div>
+
+<!-- PLAYLIST UPLOAD MODAL -->
+<div class="upload-modal" id="playlistUploadModal">
+  <div class="upload-content">
+    <div class="upload-modal-title">Add Songs to Playlist</div>
+    <div class="upload-drop-zone" id="playlistDropZone">
+      <div class="upload-drop-zone-icon">🎵</div>
+      <div class="upload-drop-zone-text">Drag & drop audio/video files here</div>
+      <div class="upload-drop-zone-subtext">or click to browse (multiple files supported)</div>
+    </div>
+    <button class="cancel" style="width: 100%;" onclick="closePlaylistUploadModal()">Close</button>
+  </div>
+</div>
+
+<!-- SCHEDULE UPLOAD MODAL -->
+<div class="upload-modal" id="scheduleUploadModal">
+  <div class="upload-content">
+    <div class="upload-modal-title">Upload File for Scheduling</div>
+    <div class="upload-drop-zone" id="scheduleDropZone">
+      <div class="upload-drop-zone-icon">📁</div>
+      <div class="upload-drop-zone-text">Drag & drop audio/video file here</div>
+      <div class="upload-drop-zone-subtext">or click to browse (single file)</div>
+    </div>
+    <button class="cancel" style="width: 100%;" onclick="closeScheduleUploadModal()">Close</button>
   </div>
 </div>
 
@@ -427,18 +897,70 @@ let running = false;
 let pausedForSchedule = false;
 let pausedTime = 0;
 let deleteCallback = null;
-let lastTriggeredSchedule = null;
+let lastTriggeredMinute = null;
+let isLoadingScheduled = false;
+let draggedItem = null;
+let draggedIndex = null;
 
 const mainVideo = document.getElementById("mainVideo");
 const popup = document.getElementById("popup");
 const popupVideo = document.getElementById("popupVideo");
 const confirmModal = document.getElementById("confirmModal");
+const playlistUpload = document.getElementById("playlistUpload");
+const scheduleUpload = document.getElementById("scheduleUpload");
+const vinylRecord = document.getElementById("vinylRecord");
+const nowPlayingStatus = document.getElementById("nowPlayingStatus");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const playlistUploadModal = document.getElementById("playlistUploadModal");
+const scheduleUploadModal = document.getElementById("scheduleUploadModal");
+const playlistDropZone = document.getElementById('playlistDropZone');
+const scheduleDropZone = document.getElementById('scheduleDropZone');
+
+// Modal functions
+function showPlaylistUploadModal() {
+  playlistUploadModal.classList.add('active');
+}
+
+function closePlaylistUploadModal() {
+  playlistUploadModal.classList.remove('active');
+}
+
+function showScheduleUploadModal() {
+  scheduleUploadModal.classList.add('active');
+}
+
+function closeScheduleUploadModal() {
+  scheduleUploadModal.classList.remove('active');
+}
+
+// Close modals when clicking outside
+playlistUploadModal.onclick = (e) => {
+  if (e.target === playlistUploadModal) {
+    closePlaylistUploadModal();
+  }
+};
+
+scheduleUploadModal.onclick = (e) => {
+  if (e.target === scheduleUploadModal) {
+    closeScheduleUploadModal();
+  }
+};
 
 // Ensure only one video plays at a time
 mainVideo.onplay = () => {
   if (!popupVideo.paused && !popup.classList.contains('active')) {
     popupVideo.pause();
   }
+  vinylRecord.classList.add('playing');
+  nowPlayingStatus.textContent = 'Playing';
+  playPauseBtn.innerHTML = '⏸ Pause';
+  renderPlaylist();
+};
+
+mainVideo.onpause = () => {
+  vinylRecord.classList.remove('playing');
+  nowPlayingStatus.textContent = 'Paused';
+  playPauseBtn.innerHTML = '▶ Play';
 };
 
 popupVideo.onplay = () => {
@@ -446,6 +968,57 @@ popupVideo.onplay = () => {
     mainVideo.pause();
   }
 };
+
+/* ---------------- DRAG & DROP FOR FILES ---------------- */
+
+playlistDropZone.addEventListener('click', () => playlistUpload.click());
+playlistDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  playlistDropZone.classList.add('dragover');
+});
+playlistDropZone.addEventListener('dragleave', () => {
+  playlistDropZone.classList.remove('dragover');
+});
+playlistDropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  playlistDropZone.classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files);
+  for (let file of files) {
+    if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+      const u = await upload(file);
+      playlist.push(u);
+    }
+  }
+  savePlaylist();
+  renderPlaylist();
+  closePlaylistUploadModal();
+});
+
+scheduleDropZone.addEventListener('click', () => scheduleUpload.click());
+scheduleDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  scheduleDropZone.classList.add('dragover');
+});
+scheduleDropZone.addEventListener('dragleave', () => {
+  scheduleDropZone.classList.remove('dragover');
+});
+scheduleDropZone.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  scheduleDropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && (file.type.startsWith('audio/') || file.type.startsWith('video/'))) {
+    const u = await upload(file);
+    const option = document.createElement('option');
+    option.value = u.url;
+    option.textContent = u.name;
+    scheduleSelect.appendChild(option);
+    const editOption = document.createElement('option');
+    editOption.value = u.url;
+    editOption.textContent = u.name;
+    editSelect.appendChild(editOption);
+    closeScheduleUploadModal();
+  }
+});
 
 /* ---------------- UPLOAD ---------------- */
 
@@ -463,6 +1036,7 @@ playlistUpload.onchange = async e => {
   }
   savePlaylist();
   renderPlaylist();
+  closePlaylistUploadModal();
 };
 
 scheduleUpload.onchange = async e => {
@@ -471,13 +1045,65 @@ scheduleUpload.onchange = async e => {
   option.value = u.url;
   option.textContent = u.name;
   scheduleSelect.appendChild(option);
-  
-  // Also add to edit dropdown
   const editOption = document.createElement('option');
   editOption.value = u.url;
   editOption.textContent = u.name;
   editSelect.appendChild(editOption);
+  closeScheduleUploadModal();
 };
+
+/* ---------------- DRAG & DROP FOR PLAYLIST REORDERING ---------------- */
+
+function handleDragStart(e, idx) {
+  draggedItem = playlist[idx];
+  draggedIndex = idx;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', e.target.innerHTML);
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  return false;
+}
+
+function handleDragEnter(e) {
+  if (e.target.classList.contains('item')) {
+    e.target.classList.add('drag-over');
+  }
+}
+
+function handleDragLeave(e) {
+  if (e.target.classList.contains('item')) {
+    e.target.classList.remove('drag-over');
+  }
+}
+
+function handleDrop(e, dropIndex) {
+  if (e.stopPropagation) e.stopPropagation();
+  if (draggedIndex !== dropIndex) {
+    if (draggedIndex === index) {
+      index = dropIndex;
+    } else if (draggedIndex < index && dropIndex >= index) {
+      index--;
+    } else if (draggedIndex > index && dropIndex <= index) {
+      index++;
+    }
+    playlist.splice(draggedIndex, 1);
+    playlist.splice(dropIndex, 0, draggedItem);
+    savePlaylist();
+    renderPlaylist();
+  }
+  return false;
+}
+
+function handleDragEnd(e) {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.item').forEach(item => {
+    item.classList.remove('drag-over');
+  });
+}
 
 /* ---------------- EDIT SCHEDULE ---------------- */
 
@@ -486,14 +1112,12 @@ const editModal = document.getElementById("editModal");
 const editTime = document.getElementById("editTime");
 const editSelect = document.getElementById("editSelect");
 
-function showEditSchedule(index) {
+function showEditSchedule(idx) {
   closeAllDropdowns();
-  editingIndex = index;
-  const schedule = schedules[index];
-  
+  editingIndex = idx;
+  const schedule = schedules[idx];
   editTime.value = schedule.time;
   editSelect.value = schedule.url;
-  
   editModal.classList.add('active');
 }
 
@@ -506,24 +1130,19 @@ function saveEditSchedule() {
   if (!editTime.value || !editSelect.value) {
     return alert("Please select time and file");
   }
-  
   const fileName = editSelect.options[editSelect.selectedIndex].text;
   schedules[editingIndex] = {
     time: editTime.value,
     url: editSelect.value,
     name: fileName
   };
-  
   saveSchedules();
   renderSchedules();
   closeEditModal();
 }
 
-// Close edit modal when clicking outside
 editModal.onclick = (e) => {
-  if (e.target === editModal) {
-    closeEditModal();
-  }
+  if (e.target === editModal) closeEditModal();
 };
 
 /* ---------------- PLAYLIST ---------------- */
@@ -547,56 +1166,66 @@ function savePlaylist() {
   });
 }
 
-function startPlaylist() {
+function togglePlayPause() {
   if (!playlist.length) return alert("No playlist");
-  running = true;
-  play(0);
-}
-
-function pausePlaylist() {
-  mainVideo.pause();
-}
-
-function continuePlaylist() {
-  if (!playlist.length) return alert("No playlist");
-  if (!mainVideo.src) return alert("No song loaded. Press Start first.");
-  running = true;
-  mainVideo.play();
+  if (!mainVideo.src || mainVideo.ended) {
+    running = true;
+    play(0);
+  } else if (mainVideo.paused) {
+    running = true;
+    mainVideo.play();
+  } else {
+    mainVideo.pause();
+  }
 }
 
 function stopPlaylist() {
   running = false;
   mainVideo.pause();
   mainVideo.currentTime = 0;
+  mainVideo.src = '';
   pausedForSchedule = false;
   pausedTime = 0;
+  index = 0;
   document.getElementById('nowPlayingText').textContent = 'No song playing';
+  nowPlayingStatus.textContent = 'Ready';
+  vinylRecord.classList.remove('playing');
+  playPauseBtn.innerHTML = '▶ Play';
+  renderPlaylist();
 }
 
 function play(i) {
-  // Stop any currently playing video first
   mainVideo.pause();
   mainVideo.currentTime = 0;
-  
   index = i % playlist.length;
   const currentSong = playlist[index];
   mainVideo.src = currentSong.url;
   mainVideo.play();
-  
-  // Update Now Playing display
   document.getElementById('nowPlayingText').textContent = currentSong.name;
-  
+  renderPlaylist();
   mainVideo.onended = () => running && play(index + 1);
 }
 
 function renderPlaylist() {
   if (playlist.length === 0) {
-    playlistList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No songs in playlist</div>';
+    playlistList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎼</div>
+        <div class="empty-state-text">No songs in playlist</div>
+      </div>`;
     return;
   }
-  
-  playlistList.innerHTML = playlist.map((p, i) =>
-    `<div class="item">
+  playlistList.innerHTML = playlist.map((p, i) => {
+    const isPlaying = (i === index && mainVideo.src && !mainVideo.paused);
+    return `<div class="item draggable ${isPlaying ? 'playing' : ''}" 
+          draggable="true"
+          ondragstart="handleDragStart(event, ${i})"
+          ondragover="handleDragOver(event)"
+          ondragenter="handleDragEnter(event)"
+          ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event, ${i})"
+          ondragend="handleDragEnd(event)">
+      <div class="drag-handle">⋮⋮</div>
       <div class="item-left" onclick="play(${i})" style="cursor: pointer; flex: 1;">
         <div class="play-icon"></div>
         <div class="item-text">${p.name}</div>
@@ -607,21 +1236,26 @@ function renderPlaylist() {
           <div class="dropdown-item delete" onclick="showConfirmDelete('playlist', ${i}, '${p.name.replace(/'/g, "\\'")}')">Delete</div>
         </div>
       </div>
-    </div>`
-  ).join("");
+    </div>`;
+  }).join("");
 }
 
-function showConfirmDelete(type, index, name) {
+function showConfirmDelete(type, idx, name) {
   closeAllDropdowns();
   const confirmText = document.getElementById('confirmText');
   confirmText.textContent = `Are you sure you want to remove "${name}"?`;
   deleteCallback = () => {
     if (type === 'playlist') {
-      playlist.splice(index, 1);
+      if (idx === index) {
+        stopPlaylist();
+      } else if (idx < index) {
+        index--;
+      }
+      playlist.splice(idx, 1);
       savePlaylist();
       renderPlaylist();
     } else if (type === 'schedule') {
-      schedules.splice(index, 1);
+      schedules.splice(idx, 1);
       saveSchedules();
       renderSchedules();
     }
@@ -634,17 +1268,12 @@ function closeConfirmModal() {
   deleteCallback = null;
 }
 
-// Close modal when clicking outside
 confirmModal.onclick = (e) => {
-  if (e.target === confirmModal) {
-    closeConfirmModal();
-  }
+  if (e.target === confirmModal) closeConfirmModal();
 };
 
 function confirmDelete() {
-  if (deleteCallback) {
-    deleteCallback();
-  }
+  if (deleteCallback) deleteCallback();
   closeConfirmModal();
 }
 
@@ -652,16 +1281,13 @@ function toggleDropdown(event, id) {
   event.stopPropagation();
   closeAllDropdowns();
   const dropdown = document.getElementById(id);
-  if (dropdown) {
-    dropdown.classList.toggle('active');
-  }
+  if (dropdown) dropdown.classList.toggle('active');
 }
 
 function closeAllDropdowns() {
   document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
 }
 
-// Close dropdowns when clicking outside
 document.addEventListener('click', closeAllDropdowns);
 
 /* ---------------- SCHEDULE ---------------- */
@@ -670,29 +1296,20 @@ async function loadSchedules() {
   try {
     const res = await fetch(API + "/schedules");
     schedules = await res.json();
-    
-    // Populate both dropdowns with unique files from schedules
     const uniqueFiles = new Map();
     schedules.forEach(s => {
-      if (s.url && s.name) {
-        uniqueFiles.set(s.url, s.name);
-      }
+      if (s.url && s.name) uniqueFiles.set(s.url, s.name);
     });
-    
     uniqueFiles.forEach((name, url) => {
-      // Add to schedule dropdown
       const option = document.createElement('option');
       option.value = url;
       option.textContent = name;
       scheduleSelect.appendChild(option);
-      
-      // Add to edit dropdown
       const editOption = document.createElement('option');
       editOption.value = url;
       editOption.textContent = name;
       editSelect.appendChild(editOption);
     });
-    
     renderSchedules();
   } catch (e) {
     console.log("Could not load schedules");
@@ -723,11 +1340,14 @@ function addSchedule() {
 
 function renderSchedules() {
   if (schedules.length === 0) {
-    scheduleList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No scheduled items</div>';
+    scheduleList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <div class="empty-state-text">No scheduled items</div>
+      </div>`;
     updateNextScheduled();
     return;
   }
-  
   const listHTML = schedules.map((s, i) =>
     `<div class="item">
       <div class="item-left" style="flex: 1;">
@@ -735,7 +1355,7 @@ function renderSchedules() {
         <div class="item-text">${s.name || 'Scheduled item'}</div>
       </div>
       <div class="item-right">
-        <span style="margin-right: 10px;">${s.time}</span>
+        <span style="margin-right: 10px; font-weight: 600; color: #3498db;">${s.time}</span>
         <span class="arrow" onclick="toggleDropdown(event, 'schedule-${i}')">⋮</span>
         <div class="dropdown" id="schedule-${i}">
           <div class="dropdown-item" onclick="showEditSchedule(${i})">Edit</div>
@@ -744,7 +1364,6 @@ function renderSchedules() {
       </div>
     </div>`
   ).join("");
-  
   scheduleList.innerHTML = listHTML;
   updateNextScheduled();
 }
@@ -752,101 +1371,84 @@ function renderSchedules() {
 function updateNextScheduled() {
   const now = new Date();
   const currentTime = now.toTimeString().slice(0, 5);
-  
-  // Find next scheduled item
   const upcoming = schedules
     .map((s, i) => ({ ...s, index: i }))
     .filter(s => s.time > currentTime)
     .sort((a, b) => a.time.localeCompare(b.time));
-  
   const nextScheduledText = document.getElementById('nextScheduledText');
-  
   if (upcoming.length > 0) {
     const next = upcoming[0];
-    nextScheduledText.textContent = `${next.name} at ${next.time}`;
+    nextScheduledText.textContent = `🕐 ${next.name} at ${next.time}`;
   } else if (schedules.length > 0) {
-    // If no upcoming today, show first one for tomorrow
     const first = schedules.sort((a, b) => a.time.localeCompare(b.time))[0];
-    nextScheduledText.textContent = `${first.name} at ${first.time} (tomorrow)`;
+    nextScheduledText.textContent = `🕐 ${first.name} at ${first.time} (tomorrow)`;
   } else {
     nextScheduledText.textContent = 'No upcoming scheduled items';
   }
 }
 
+// FIXED SCHEDULING - Only triggers once per minute
 setInterval(() => {
   const now = new Date();
   const t = now.toTimeString().slice(0,5);
-  
-  schedules.forEach((s, i) => {
-    const scheduleKey = `${s.time}-${s.url}`;
-    if (s.time === t && lastTriggeredSchedule !== scheduleKey) {
-      lastTriggeredSchedule = scheduleKey;
-      playScheduled(s.url);
-    }
-  });
-  
-  // Reset trigger flag when minute changes
-  const currentMinute = now.getMinutes();
-  if (currentMinute !== (new Date(Date.now() - 1000).getMinutes())) {
-    lastTriggeredSchedule = null;
+  const currentMinute = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+  if (currentMinute !== lastTriggeredMinute) {
+    schedules.forEach((s, i) => {
+      if (s.time === t) {
+        playScheduled(s.url);
+        lastTriggeredMinute = currentMinute;
+      }
+    });
   }
-  
   updateNextScheduled();
 }, 1000);
 
 function playScheduled(url) {
-  // Find the scheduled item name
+  if (isLoadingScheduled) return;
+  isLoadingScheduled = true;
   const scheduledItem = schedules.find(s => s.url === url);
-  
-  // Save current playlist state if it's playing
-  if (running && !mainVideo.paused) {
+  if (mainVideo.src && !mainVideo.ended) {
     pausedForSchedule = true;
     pausedTime = mainVideo.currentTime;
     mainVideo.pause();
   }
-  
-  // Stop popup video completely
   popupVideo.pause();
   popupVideo.currentTime = 0;
-  
-  // Set new source WITHOUT showing popup first
   popupVideo.src = url;
-  
-  // Show popup and play only after video is ready
-  popupVideo.oncanplay = function() {
+  popupVideo.load();
+  popupVideo.addEventListener('loadeddata', function onLoaded() {
     popup.classList.add("active");
-    this.play();
-    this.oncanplay = null; // Remove this handler immediately
-  };
-  
-  // Update Now Playing for scheduled item
+    popupVideo.play().catch(() => {
+      isLoadingScheduled = false;
+    });
+  }, { once: true });
+  popupVideo.addEventListener('playing', function onPlaying() {
+    isLoadingScheduled = false;
+  }, { once: true });
   if (scheduledItem) {
     document.getElementById('nowPlayingText').textContent = scheduledItem.name + ' (Scheduled)';
+    nowPlayingStatus.textContent = 'Scheduled Playing';
   }
 }
   
-  popupVideo.onended = () => {
-    popup.classList.remove("active");
-    
-    // Resume playlist if it was playing before
-    if (pausedForSchedule && playlist.length > 0) {
-      mainVideo.currentTime = pausedTime;
-      mainVideo.play();
-      pausedForSchedule = false;
-      pausedTime = 0;
-      document.getElementById('nowPlayingText').textContent = playlist[index].name;
-    } else if (!running) {
-      document.getElementById('nowPlayingText').textContent = 'No song playing';
-    }
-  };
+popupVideo.onended = () => {
+  popup.classList.remove("active");
+  if (pausedForSchedule && playlist.length > 0) {
+    mainVideo.currentTime = pausedTime;
+    mainVideo.play();
+    pausedForSchedule = false;
+    pausedTime = 0;
+    document.getElementById('nowPlayingText').textContent = playlist[index].name;
+  } else if (!running) {
+    document.getElementById('nowPlayingText').textContent = 'No song playing';
+    nowPlayingStatus.textContent = 'Ready';
+  }
+};
 
-// Close popup on click outside video
 popup.onclick = (e) => {
   if (e.target === popup) {
     popup.classList.remove("active");
     popupVideo.pause();
-    
-    // Resume playlist if it was paused for schedule
     if (pausedForSchedule && playlist.length > 0) {
       mainVideo.currentTime = pausedTime;
       mainVideo.play();
@@ -855,6 +1457,7 @@ popup.onclick = (e) => {
       document.getElementById('nowPlayingText').textContent = playlist[index].name;
     } else if (!running) {
       document.getElementById('nowPlayingText').textContent = 'No song playing';
+      nowPlayingStatus.textContent = 'Ready';
     }
   }
 };
